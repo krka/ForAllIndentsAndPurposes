@@ -1,0 +1,8 @@
+## Interface: 20003
+## Title: For all indents and purposes
+## Notes: Adds indentation and syntax highlighting
+## Dependencies:
+## OptionalDeps: 
+## SavedVariables: 
+indent.lua
+defaulthooks.lua
