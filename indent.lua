@@ -508,32 +508,18 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
    local indentRight = {0, 1}
    local indentBoth = {-1, 1}
 
+   local function addToTable(t, value, keys)
+      for key in string.gmatch(keys, "(%w+)") do
+         t[key] = value
+      end
+   end
+
    local keywords = {}
    lib.keywords = keywords
-   keywords["and"] = noIndentEffect
-   keywords["break"] = noIndentEffect
-   keywords["false"] = noIndentEffect
-   keywords["for"] = noIndentEffect
-   keywords["if"] = noIndentEffect
-   keywords["in"] = noIndentEffect
-   keywords["local"] = noIndentEffect
-   keywords["nil"] = noIndentEffect
-   keywords["not"] = noIndentEffect
-   keywords["or"] = noIndentEffect
-   keywords["return"] = noIndentEffect
-   keywords["true"] = noIndentEffect
-   keywords["while"] = noIndentEffect
-
-   keywords["until"] = indentLeft
-   keywords["elseif"] = indentLeft
-   keywords["end"] = indentLeft
-   
-   keywords["do"] = indentRight
-   keywords["then"] = indentRight
-   keywords["repeat"] = indentRight
-   keywords["function"] = indentRight
-
-   keywords["else"] = indentBoth
+   addToTable(keywords, noIndentEffect, "and break false for if in local nil not or return true while")
+   addToTable(keywords, indentLeft, "until elseif end")
+   addToTable(keywords, indentRight, "do then repeat function")
+   addToTable(keywords, indentBoth, "else")
 
    tokenIndentation = {}
    lib.tokenIndentation = tokenIndentation
