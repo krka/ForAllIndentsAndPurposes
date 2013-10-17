@@ -1,0 +1,18 @@
+|c00999999--[[ long comment ]]|r
+
+|c00999999--[==[ Another long comment ]==]|r
+
+|c006666ffif|r a |c006666ffthen|r 
+    b |c00ff99ff=|r c
+|c006666ffelse|r
+    d |c00ff99ff=|r e
+|c006666ffend|r
+
+|c00999999--[==[ Another long [[ ]]
+
+
+[===[ Hello ]===] ]=]
+ comment ]==]|r
+
+|c006666ffif|r x |c0055ff88==|r |c00ffff77[=[this is a string ]=]|r |c006666ffthen|r
+|c006666ffend|r
