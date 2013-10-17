@@ -1,0 +1,3 @@
+print |c00ffff77"test"|r
+|c006666fflocal|r res |c00ff99ff=|r |c00112233SpecialFunction|r|c00ff99ff(|r|c00ff99ff)|r
+

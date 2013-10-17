@@ -51,3 +51,24 @@ end
 
 testIndenter()
 
+function tablecopy(t)
+   copy = {}
+   for k, v in pairs(t) do
+      copy[k] = v
+   end
+   return copy
+end
+
+function testAddCustomColor(i)
+   local lib = IndentationLib
+   local input = readAll("test_customcolor_input.txt")
+   local output = readAll("test_customcolor_output.txt")
+   
+   local colorTable = tablecopy(lib.defaultColorTable)
+   colorTable.SpecialFunction = '|c00112233'
+   local actual = lib.indentCode(input, 4, colorTable, i)
+   assert(output == actual, "Failure, got:\n" .. actual)
+end
+
+testAddCustomColor()
+
