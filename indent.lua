@@ -635,16 +635,16 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
 	    
 				local color
 				if stopColor then
-					color = colorTable[str]
-					if not color then
+					if colorTable == lib.defaultColorTable and tokenType == tokens.TOKEN_STRING and lib.defaultTextColorTable[ stringsub(str, 2, -2) ] then
+						color = lib.defaultTextColorTable[ stringsub(str, 2, -2 )]
+					elseif colorTable[str] then
+						color = colorTable[str]
+					elseif colorTable[tokenType] then
 						color = colorTable[tokenType]
-						if not color then
-							if tokenType == tokens.TOKEN_IDENTIFIER then
-								color = colorTable[tokens.TOKEN_IDENTIFIER]
-							else
-								color = colorTable[tokens.TOKEN_SPECIAL]
-							end
-						end
+					elseif tokenType == tokens.TOKEN_IDENTIFIER then
+						color = colorTable[tokens.TOKEN_IDENTIFIER]
+					else
+						color = colorTable[tokens.TOKEN_SPECIAL]
 					end
 				end
 	    
@@ -789,6 +789,7 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
 	    
 					-- See if this is an indent-modifier
 					local indentTable
+										
 					if tokenType == tokens.TOKEN_IDENTIFIER then
 						indentTable = keywords[str]
 					else
@@ -816,19 +817,19 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
 	    
 					local color
 					if stopColor then
-						color = colorTable[str]
-						if not color then
+						if colorTable == lib.defaultColorTable and tokenType == tokens.TOKEN_STRING and lib.defaultTextColorTable[ stringsub(str, 2, -2) ] then
+							color = lib.defaultTextColorTable[ stringsub(str, 2, -2 )]
+						elseif colorTable[str] then
+							color = colorTable[str]
+						elseif colorTable[tokenType] then
 							color = colorTable[tokenType]
-							if not color then
-								if tokenType == tokens.TOKEN_IDENTIFIER then
-									color = colorTable[tokens.TOKEN_IDENTIFIER]
-								else
-									color = colorTable[tokens.TOKEN_SPECIAL]
-								end
-							end
+						elseif tokenType == tokens.TOKEN_IDENTIFIER then
+							color = colorTable[tokens.TOKEN_IDENTIFIER]
+						else
+							color = colorTable[tokens.TOKEN_SPECIAL]
 						end
 					end
-	    
+					
 					if color then
 						tsize2 = tsize2 + 1
 						workingTable2[tsize2] = color
@@ -1253,11 +1254,7 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
 	local arithmeticColor = "|c0033ff55"
 	local logicColor1 = "|c0055ff88"
 	local logicColor2 = "|c0088ffbb"
-	
-	local methodColor = "|c0000ffff"
-	local eventColor = "|c00cc66ff"
-	local AceColor = "|c00ff00ff"
-	
+		
 	defaultColorTable = {
 		[tokens.TOKEN_SPECIAL] = "|c00ff99ff",
 		[tokens.TOKEN_KEYWORD] = "|c006666ff",
@@ -1307,11 +1304,14 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
 				for index, value in pairs( defaultColorTableImport ) do
 					defaultColorTable[index] = value
 				end
+				defaultColorTableImport = nil
 			end
 			if defaultTextColorTableImport then
 				for index, value in pairs( defaultTextColorTableImport ) do
+					print(" loading ")
 					defaultTextColorTable[index] = value
 				end
+				defaultTextColorTableImport = nil
 			end
 		end
 		return self, event, ...
