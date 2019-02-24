@@ -1,5 +1,5 @@
 -- For All Indents And Purposes
-local revision = 17
+local revision = 21
 -- Maintainer: kristofer.karlsson@gmail.com
 
 -- For All Indents And Purposes -
@@ -22,6 +22,8 @@ local revision = 17
 -- Read through this code for further usage help.
 -- (The documentation IS the code)
 
+-- luacheck: globals IndentationLib
+
 if not IndentationLib then
     IndentationLib = {}
 end
@@ -38,6 +40,9 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
     local stringchar = string.char
     local stringrep = string.rep
     local stringgsub = string.gsub
+
+    local defaultTabWidth = 2
+    local defaultColorTable
 
     local workingTable = {}
     local workingTable2 = {}
@@ -60,7 +65,6 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
     -- token types
     local tokens = {}
     lib.tokens = tokens
-
     tokens.TOKEN_UNKNOWN = 0
     tokens.TOKEN_NUMBER = 1
     tokens.TOKEN_LINEBREAK = 2
@@ -97,12 +101,10 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
     tokens.TOKEN_SPECIAL = 34
     tokens.TOKEN_VERTICAL = 35
     tokens.TOKEN_TILDE = 36
-
     -- WoW specific tokens
     tokens.TOKEN_COLORCODE_START = 37
     tokens.TOKEN_COLORCODE_STOP = 38
-
--- new as of lua 5.1
+    -- new as of lua 5.1
     tokens.TOKEN_HASH = 39
     tokens.TOKEN_PERCENT = 40
 
@@ -144,8 +146,7 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
     bytes.BYTE_VERTICAL = stringbyte("|")
     bytes.BYTE_r = stringbyte("r")
     bytes.BYTE_c = stringbyte("c")
-
--- new as of lua 5.1
+    -- new as of lua 5.1
     bytes.BYTE_HASH = stringbyte("#")
     bytes.BYTE_PERCENT = stringbyte("%")
 
@@ -185,7 +186,7 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
     specialCharacters[bytes.BYTE_ASTERISK] = tokens.TOKEN_ASTERISK
     -- WoW specific
     specialCharacters[bytes.BYTE_VERTICAL] = -1
--- new as of lua 5.1
+    -- new as of lua 5.1
     specialCharacters[bytes.BYTE_HASH] = tokens.TOKEN_HASH
     specialCharacters[bytes.BYTE_PERCENT] = tokens.TOKEN_PERCENT
 
@@ -264,9 +265,9 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
             local byte = stringbyte(text, pos)
 
             if not byte or
-                linebreakCharacters[byte] or
-                whitespaceCharacters[byte] or
-                specialCharacters[byte] then
+            linebreakCharacters[byte] or
+            whitespaceCharacters[byte] or
+            specialCharacters[byte] then
                 return tokens.TOKEN_IDENTIFIER, pos
             end
             pos = pos + 1
@@ -292,7 +293,6 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
             return false
         end
     end
-
 
     -- Already parsed the [==[ part when get here
     local function nextBracketString(text, pos, equalsCount)
@@ -375,7 +375,7 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
     -- OUTPUT
     -- 1: token type
     -- 2: position after the last character of the token
-    function nextToken(text, pos)
+    local function nextToken(text, pos)
         local byte = stringbyte(text, pos)
         if not byte then
             return nil
@@ -508,20 +508,34 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
     local indentRight = {0, 1}
     local indentBoth = {-1, 1}
 
-    local function addToTable(t, value, keys)
-        for key in string.gmatch(keys, "(%w+)") do
-            t[key] = value
-        end
-    end
-
     local keywords = {}
     lib.keywords = keywords
-    addToTable(keywords, noIndentEffect, "and break false for if in local nil not or return true while")
-    addToTable(keywords, indentLeft, "until elseif end")
-    addToTable(keywords, indentRight, "do then repeat function")
-    addToTable(keywords, indentBoth, "else")
+    keywords["and"] = noIndentEffect
+    keywords["break"] = noIndentEffect
+    keywords["false"] = noIndentEffect
+    keywords["for"] = noIndentEffect
+    keywords["if"] = noIndentEffect
+    keywords["in"] = noIndentEffect
+    keywords["local"] = noIndentEffect
+    keywords["nil"] = noIndentEffect
+    keywords["not"] = noIndentEffect
+    keywords["or"] = noIndentEffect
+    keywords["return"] = noIndentEffect
+    keywords["true"] = noIndentEffect
+    keywords["while"] = noIndentEffect
 
-    tokenIndentation = {}
+    keywords["until"] = indentLeft
+    keywords["elseif"] = indentLeft
+    keywords["end"] = indentLeft
+
+    keywords["do"] = indentRight
+    keywords["then"] = indentRight
+    keywords["repeat"] = indentRight
+    keywords["function"] = indentRight
+
+    keywords["else"] = indentBoth
+
+    local tokenIndentation = {}
     lib.tokenIndentation = tokenIndentation
     tokenIndentation[tokens.TOKEN_LEFTPAREN] = indentRight
     tokenIndentation[tokens.TOKEN_LEFTBRACKET] = indentRight
@@ -587,7 +601,6 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
 
             if tokenType == tokens.TOKEN_COLORCODE_START or tokenType == tokens.TOKEN_COLORCODE_STOP or tokenType == tokens.TOKEN_UNKNOWN then
                 -- ignore color codes
-
             elseif tokenType == tokens.TOKEN_LINEBREAK or tokenType == tokens.TOKEN_WHITESPACE then
                 if tokenType == tokens.TOKEN_LINEBREAK then
                     numLines = numLines + 1
@@ -665,7 +678,6 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
         local tsize2 = 0
         local totalLen2 = 0
 
-
         local stopColor = colorTable and colorTable[0]
         local stopColorLen = not stopColor or stringlen(stopColor)
 
@@ -718,7 +730,6 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
                     newCaretPositionFinalized = true
                 end
 
-
                 for k, v in next,workingTable2 do
                     tsize = tsize + 1
                     workingTable[tsize] = v
@@ -747,7 +758,6 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
             elseif tokenType == tokens.TOKEN_WHITESPACE then
                 if hitNonWhitespace then
                     prevTokenWidth = nextPos - pos
-
                     tsize2 = tsize2 + 1
                     local s = stringsub(code, pos, nextPos - 1)
                     workingTable2[tsize2] = s
@@ -757,9 +767,7 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
                 -- skip these, though they shouldn't be encountered here anyway
             else
                 hitNonWhitespace = true
-
                 local str = stringsub(code, pos, nextPos - 1)
-
                 prevTokenWidth = nextPos - pos
 
                 -- See if this is an indent-modifier
@@ -767,7 +775,7 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
                 if tokenType == tokens.TOKEN_IDENTIFIER then
                     indentTable = keywords[str]
                 else
-                    indentTable = tokenIndentation[tokenType]
+                    indentTable = lib.tokenIndentation[tokenType]
                 end
 
                 if indentTable then
@@ -830,8 +838,6 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
         return table.concat(workingTable), newCaretPosition
     end
 
-
-
     -- WoW specific code:
     local GetTime = GetTime
 
@@ -867,8 +873,8 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
         local script = critical_enter(editbox)
 
         local text = editboxGetText(editbox)
-        editbox:Insert("\1")
-        local pos = stringfind(editboxGetText(editbox), "\1", 1, 1)
+        editbox:Insert("")
+        local pos = stringfind(editboxGetText(editbox), "", 1, 1)
         editboxSetText(editbox, text)
 
         if pos then
@@ -880,7 +886,7 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
     end
 
     local function setCaretPos(editbox, pos)
-        local script = critical_enter(editbox)
+        local script, script2 = critical_enter(editbox)
         setCaretPos_main(editbox, pos)
         critical_leave(editbox, script, script2)
     end
@@ -979,9 +985,6 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
         return code .. "\n\n", true
 
     end
-
-    local defaultTabWidth = 2
-    local defaultColorTable
 
     -- Data tables
     -- No weak table magic, since editboxes can never be removed in WoW
@@ -1264,3 +1267,49 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
 
 end
 
+-- just for testing
+--[[
+function testTokenizer()
+  local str = ""
+  for line in io.lines("indent.lua") do
+   str = str .. line .. "\n"
+  end
+
+  local pos = 1
+
+  while true do
+   local tokenType, nextPos = nextToken(str, pos)
+
+   if not tokenType then
+  break
+   end
+
+   if true or tokenType ~= tokens.TOKEN_WHITESPACE and tokenType ~= tokens.TOKEN_LINEBREAK then
+  print(stringformat("Found token %d (%d-%d): (%s)", tokenType, pos, nextPos - 1, stringsub(str, pos, nextPos - 1)))
+   end
+
+   if tokenType == tokens.TOKEN_UNKNOWN then
+  print("unknown token!")
+  break
+   end
+
+   pos = nextPos
+  end
+end
+
+
+function testIndenter(i)
+  local lib = IndentationLib
+  local str = ""
+  for line in io.lines("test.lua") do
+   str = str .. line .. "\n"
+  end
+
+  local colorTable = lib.defaultColorTable
+  print(lib.indentCode(str, 4, colorTable, i))
+end
+
+
+testIndenter()
+
+--]]
