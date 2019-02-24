@@ -977,7 +977,7 @@ if not IndentationLib.revision or revision > IndentationLib.revision then
     function lib.padWithLinebreaks(code)
         local len = stringlen(code)
         local linebreakcount = 0
-        while len > 0 or linebreakcount < 2 do
+        while len > 0 and linebreakcount < 2 do
             local b = stringbyte(code, len)
             if b == linebreak then
                 linebreakcount = linebreakcount + 1

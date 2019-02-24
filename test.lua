@@ -114,5 +114,7 @@ function testPadWithLinebreaks()
     local actual = lib.padWithLinebreaks("local x=1\n\n")
     assert("local x=1\n\n" == actual, "Failure, got:\n" .. actual)
 
+    local actual = lib.padWithLinebreaks("\n\n\n")
+    assert("\n\n\n" == actual, "Failure, got:\n" .. actual)
 end
 testPadWithLinebreaks()
