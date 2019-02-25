@@ -1,3 +1,9 @@
+rev 22:
+* fixed padWithLinebreaks to avoid adding more linebreaks if there are trailing whitespaces
+
+rev 18..21:
+* nobody knows...
+
 rev 17:
 * internal parser / highlighter / indenter system unchanged
 * major rewrite of wow interfacing code, including disabling / enabling
